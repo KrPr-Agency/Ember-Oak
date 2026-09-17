@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ember & Oak — Specialty Coffee, Pune</title>
+<meta name="description" content="Ember & Oak is a specialty coffee house on Riverside Avenue, Pune. Single-origin coffee, all-day plates, and warm rooms built for lingering. Open daily, 8am–11pm.">
+<meta property="og:title" content="Ember & Oak — Coffee worth slowing down for">
+<meta property="og:description" content="Specialty coffee, thoughtful plates, and warm spaces made for lingering. 21 Riverside Avenue, Pune.">
+<meta property="og:type" content="website">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CafeOrCoffeeShop",
+  "name": "Ember & Oak",
+  "servesCuisine": "Coffee, Café",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "21 Riverside Avenue",
+    "addressLocality": "Pune",
+    "addressRegion": "Maharashtra",
+    "addressCountry": "IN"
+  },
+  "openingHours": "Mo-Su 08:00-23:00",
+  "telephone": "+91-20-0000-0000",
+  "sameAs": ["https://instagram.com/emberandoak"]
+}
+</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☕</text></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Public+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="styles.css">
+
+<style>
+  :root {
+    --espresso: #1A1310;
+    --cream: #F2EBDD;
+    --paper: #FAF6EE;
+    --bark: #5C4B3B;
+    --copper: #A5623A;
+    --olive: #6C6A47;
+  }
+  * { -webkit-font-smoothing: antialiased; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  }
+  body {
+    background: var(--paper);
+    color: var(--espresso);
+    font-family: 'Public Sans', sans-serif;
+    overflow-x: hidden;
+  }
+  .font-display { font-family: 'Fraunces', serif; font-optical-sizing: auto; }
+
+  /* Grain overlay for photographic blocks */
+  .grain::after {
+    content: "";
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .photo { position: relative; overflow: hidden; isolation: isolate; }
+  .photo-label {
+    position: absolute; left: 0.9rem; bottom: 0.8rem; z-index: 2;
+    font-family: 'Public Sans', sans-serif; font-size: 0.62rem; letter-spacing: 0.08em;
+    color: rgba(250,246,238,0.78);
+    text-transform: none;
+  }
+
+  /* ---------- Reveal animations ---------- */
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity 1s cubic-bezier(.19,1,.22,1), transform 1s cubic-bezier(.19,1,.22,1); }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+
+  .reveal-stagger > * { opacity: 0; transform: translateY(24px); transition: opacity 0.9s cubic-bezier(.19,1,.22,1), transform 0.9s cubic-bezier(.19,1,.22,1); }
+  .reveal-stagger.in > * { opacity: 1; transform: translateY(0); }
+  .reveal-stagger.in > *:nth-child(1) { transition-delay: 0.05s; }
+  .reveal-stagger.in > *:nth-child(2) { transition-delay: 0.15s; }
+  .reveal-stagger.in > *:nth-child(3) { transition-delay: 0.25s; }
+  .reveal-stagger.in > *:nth-child(4) { transition-delay: 0.35s; }
+  .reveal-stagger.in > *:nth-child(5) { transition-delay: 0.45s; }
+  .reveal-stagger.in > *:nth-child(6) { transition-delay: 0.55s; }
+  .reveal-stagger.in > *:nth-child(7) { transition-delay: 0.65s; }
+
+  /* ======================================================
+     PREMIUM PHOTO HOVER — multi-layer cinematic effect
+     ====================================================== */
+  .photo.hover-scale {
+    transition: box-shadow 0.9s cubic-bezier(.19,1,.22,1),
+                transform 0.9s cubic-bezier(.19,1,.22,1);
+    will-change: transform;
+  }
+  /* The zoom layer (scaletarget covers the bg image) */
+  .hover-scale .scaletarget {
+    transition: transform 2s cubic-bezier(.19,1,.22,1),
+                filter 1.4s cubic-bezier(.19,1,.22,1);
+    will-change: transform, filter;
+    background: inherit;
+    background-size: inherit;
+    background-position: inherit;
+  }
+  .hover-scale:hover .scaletarget {
+    transform: scale(1.09);
+    filter: brightness(1.08) saturate(1.12) contrast(1.03);
+  }
+  /* Subtle warm vignette ring on hover — enhances depth */
+  .photo.hover-scale::before {
+    content: "";
+    position: absolute; inset: 0; z-index: 1;
+    background: radial-gradient(circle at center, transparent 45%, rgba(26,19,16,0.28) 100%);
+    opacity: 0;
+    transition: opacity 1.2s cubic-bezier(.19,1,.22,1);
+    pointer-events: none;
+  }
+  .photo.hover-scale:hover::before { opacity: 1; }
+
+  /* Lift + soft shadow on wider / feature blocks */
+  .photo.hover-scale:hover {
+    box-shadow: 0 30px 60px -30px rgba(26,19,16,0.45),
+                0 10px 24px -12px rgba(165,98,58,0.25);
+  }
+
+  /* ---------- Photo label reveal on hover ---------- */
+  .photo .photo-label {
+    opacity: 0; transform: translateY(6px);
+    transition: opacity 0.7s cubic-bezier(.19,1,.22,1),
+                transform 0.7s cubic-bezier(.19,1,.22,1);
+  }
+  .photo:hover .photo-label { opacity: 1; transform: translateY(0); }
+  .photo.always-label .photo-label { opacity: 1; transform: none; }
+
+  /* ---------- Nav link underline ---------- */
+  .nav-link { position: relative; }
+  .nav-link::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -4px; height: 1px;
+    background: currentColor; transform: scaleX(0); transform-origin: left;
+    transition: transform 0.6s cubic-bezier(.19,1,.22,1);
+  }
+  .nav-link:hover::after { transform: scaleX(1); }
+
+  /* ======================================================
+     PREMIUM BUTTONS — refined hover with luxury details
+     ====================================================== */
+
+  /* --- Primary: espresso → copper, shimmer sweep, lift, warm glow --- */
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    background: var(--espresso); color: var(--paper);
+    padding: 0.9rem 1.7rem; font-size: 0.85rem; letter-spacing: 0.02em;
+    position: relative; overflow: hidden; z-index: 0;
+    border: 1px solid var(--espresso);
+    transition: color 0.6s cubic-bezier(.19,1,.22,1),
+                border-color 0.6s cubic-bezier(.19,1,.22,1),
+                transform 0.6s cubic-bezier(.19,1,.22,1),
+                box-shadow 0.6s cubic-bezier(.19,1,.22,1);
+  }
+  /* Copper fill that rises from bottom */
+  .btn-primary::before {
+    content: ""; position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(135deg, #A5623A 0%, #C4784A 100%);
+    transform: scaleY(0); transform-origin: bottom;
+    transition: transform 0.7s cubic-bezier(.19,1,.22,1);
+  }
+  /* Light shimmer sweep */
+  .btn-primary::after {
+    content: ""; position: absolute; top: 0; bottom: 0; width: 40%;
+    left: -60%;
+    background: linear-gradient(115deg, transparent 0%, rgba(255,255,255,0.28) 50%, transparent 100%);
+    transform: skewX(-18deg);
+    transition: left 0.9s cubic-bezier(.19,1,.22,1);
+    pointer-events: none;
+  }
+  .btn-primary:hover {
+    color: var(--paper);
+    border-color: var(--copper);
+    transform: translateY(-2px);
+    box-shadow: 0 18px 40px -18px rgba(165,98,58,0.65),
+                0 6px 16px -6px rgba(26,19,16,0.35);
+  }
+  .btn-primary:hover::before { transform: scaleY(1); }
+  .btn-primary:hover::after { left: 120%; }
+  .btn-primary:active { transform: translateY(-1px); }
+
+  /* --- Outline: fills from bottom with currentColor, text inverts --- */
+  .btn-outline {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    border: 1px solid currentColor;
+    padding: 0.85rem 1.65rem; font-size: 0.85rem; letter-spacing: 0.02em;
+    position: relative; overflow: hidden; z-index: 0;
+    transition: color 0.6s cubic-bezier(.19,1,.22,1),
+                border-color 0.6s cubic-bezier(.19,1,.22,1),
+                transform 0.6s cubic-bezier(.19,1,.22,1),
+                box-shadow 0.6s cubic-bezier(.19,1,.22,1);
+  }
+  .btn-outline::before {
+    content: ""; position: absolute; inset: 0; z-index: -1;
+    background: var(--espresso);
+    transform: translateY(101%);
+    transition: transform 0.7s cubic-bezier(.19,1,.22,1);
+  }
+  .btn-outline:hover {
+    color: var(--paper);
+    border-color: var(--espresso);
+    transform: translateY(-2px);
+    box-shadow: 0 18px 40px -20px rgba(26,19,16,0.5);
+  }
+  .btn-outline:hover::before { transform: translateY(0); }
+
+  /* On dark sections, the outline keeps its light inversion */
+  .btn-outline.border-paper\/60:hover,
+  .btn-outline.border-paper\/70:hover {
+    color: var(--espresso);
+    border-color: var(--paper);
+  }
+  .btn-outline.border-paper\/60:hover::before,
+  .btn-outline.border-paper\/70:hover::before {
+    background: var(--paper);
+  }
+
+  /* ---------- Menu tabs ---------- */
+  .menu-tab { transition: color 0.4s cubic-bezier(.19,1,.22,1), opacity 0.4s ease; position: relative; }
+  .menu-tab::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
+    background: var(--copper); transform: scaleX(0); transform-origin: left;
+    transition: transform 0.6s cubic-bezier(.19,1,.22,1);
+  }
+  .menu-tab.active { color: var(--copper); }
+  .menu-tab.active::after { transform: scaleX(1); }
+  .menu-tab:hover { color: var(--copper); }
+
+  .menu-panel { display: none; }
+  .menu-panel.active { display: block; animation: menuFadeIn 0.7s cubic-bezier(.19,1,.22,1); }
+  @keyframes menuFadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Menu item hover — subtle lift + copper color shift */
+  .menu-panel li {
+    transition: background-color 0.45s cubic-bezier(.19,1,.22,1),
+                padding-left 0.45s cubic-bezier(.19,1,.22,1);
+    cursor: default; border-radius: 2px;
+  }
+  .menu-panel li:hover {
+    background-color: rgba(165,98,58,0.05);
+    padding-left: 0.6rem;
+  }
+  .menu-panel li:hover .font-display { color: var(--copper); }
+  .menu-panel li .font-display { transition: color 0.45s cubic-bezier(.19,1,.22,1); }
+  .menu-panel li:hover .text-bark { color: var(--copper); }
+  .menu-panel li .text-bark { transition: color 0.45s cubic-bezier(.19,1,.22,1); }
+
+  /* ---------- Divider ---------- */
+  .divider-line { height: 1px; background: rgba(26,19,16,0.14); }
+
+  /* ---------- Mobile menu clip ---------- */
+  #mobile-menu { transition: clip-path 0.7s cubic-bezier(.76,0,.24,1); clip-path: inset(0 0 100% 0); }
+  #mobile-menu.open { clip-path: inset(0 0 0% 0); }
+  #mobile-menu .mobile-link {
+    opacity: 0; transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(.19,1,.22,1);
+  }
+  #mobile-menu.open .mobile-link { opacity: 1; transform: translateY(0); }
+  #mobile-menu.open .mobile-link:nth-child(1) { transition-delay: 0.15s; }
+  #mobile-menu.open .mobile-link:nth-child(2) { transition-delay: 0.22s; }
+  #mobile-menu.open .mobile-link:nth-child(3) { transition-delay: 0.29s; }
+  #mobile-menu.open .mobile-link:nth-child(4) { transition-delay: 0.36s; }
+  #mobile-menu.open .mobile-link:nth-child(5) { transition-delay: 0.43s; }
+
+  .glyph { opacity: 0.5; }
+
+  ::selection { background: var(--copper); color: var(--paper); }
+
+  .fs-hero { font-size: clamp(2.6rem, 6.2vw, 5.6rem); line-height: 0.98; }
+  .fs-section { font-size: clamp(2rem, 3.6vw, 3.4rem); line-height: 1.04; }
+
+  @media (max-width: 767px) {
+    body { padding-bottom: 64px; }
+  }
+
+  .img-bg { background-size: cover; background-position: center; }
+
+  .menu-desc { display: block; font-size: 0.78rem; color: rgba(92,75,59,0.75); margin-top: 0.25rem; font-family: 'Public Sans', sans-serif; letter-spacing: 0.01em; }
+
+  /* ---------- Hero: subtle slow ken-burns zoom ---------- */
+  @keyframes heroKenBurns {
+    0%   { transform: scale(1); }
+    100% { transform: scale(1.08); }
+  }
+  .hero-bg-anim { animation: heroKenBurns 22s ease-out infinite alternate; }
+
+  /* ---------- Section title underline sweep ---------- */
+  .title-sweep { position: relative; display: inline-block; }
+  .title-sweep::after {
+    content: ""; position: absolute; left: 0; bottom: -10px; height: 2px; width: 0;
+    background: var(--copper);
+    transition: width 1.2s cubic-bezier(.19,1,.22,1);
+  }
+  .title-sweep.in::after { width: 68px; }
+
+  /* ---------- Full Menu Modal ---------- */
+  .menu-modal {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(26,19,16,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+    display: flex; align-items: flex-start; justify-content: center;
+    overflow-y: auto; padding: 2rem 1rem;
+  }
+  .menu-modal.open { opacity: 1; visibility: visible; }
+  .menu-modal-card {
+    background: var(--paper);
+    max-width: 760px; width: 100%;
+    padding: 3rem 2.5rem; position: relative;
+    transform: translateY(40px) scale(0.98);
+    transition: transform 0.7s cubic-bezier(.19,1,.22,1);
+    box-shadow: 0 40px 100px -30px rgba(0,0,0,0.5);
+  }
+  .menu-modal.open .menu-modal-card { transform: translateY(0) scale(1); }
+  @media (max-width: 600px) { .menu-modal-card { padding: 2rem 1.25rem; } }
+  .menu-modal-close {
+    position: absolute; top: 1rem; right: 1rem;
+    width: 40px; height: 40px; border-radius: 9999px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; color: var(--espresso);
+    transition: background 0.35s ease, color 0.35s ease, transform 0.5s cubic-bezier(.19,1,.22,1);
+    cursor: pointer; background: transparent; border: 1px solid rgba(26,19,16,0.15);
+  }
+  .menu-modal-close:hover { background: var(--espresso); color: var(--paper); transform: rotate(90deg); }
+  .menu-modal-section-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.35rem; color: var(--copper);
+    letter-spacing: 0.02em; margin: 2rem 0 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(165,98,58,0.25);
+  }
+  .menu-modal ul { list-style: none; padding: 0; margin: 0; }
+  .menu-modal li {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 0.85rem 0.25rem;
+    border-bottom: 1px dashed rgba(26,19,16,0.08);
+    transition: padding-left 0.45s cubic-bezier(.19,1,.22,1), background 0.45s ease;
+    border-radius: 2px;
+  }
+  .menu-modal li:hover { padding-left: 0.75rem; background: rgba(165,98,58,0.05); }
+
+  /* Back to top button */
+  #back-to-top {
+    position: fixed; right: 1.5rem; bottom: 1.5rem; z-index: 90;
+    width: 48px; height: 48px; border-radius: 9999px;
+    background: var(--espresso); color: var(--paper);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; visibility: hidden; transform: translateY(20px);
+    transition: opacity 0.5s ease, visibility 0.5s ease,
+                transform 0.55s cubic-bezier(.19,1,.22,1),
+                background 0.4s ease, box-shadow 0.4s ease;
+    cursor: pointer; border: none;
+  }
+  #back-to-top.show { opacity: 1; visibility: visible; transform: translateY(0); }
+  #back-to-top:hover {
+    background: var(--copper);
+    transform: translateY(-4px);
+    box-shadow: 0 18px 40px -18px rgba(165,98,58,0.7);
+  }
+  @media (max-width: 767px) { #back-to-top { bottom: 80px; } }
+</style>
+</head>
+
+<body class="font-body">
+
+<a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-espresso focus:text-paper focus:px-4 focus:py-2">Skip to content</a>
+
+<!-- NAV -->
+<header id="site-nav" class="fixed top-0 inset-x-0 z-50 transition-all duration-500" style="background: transparent;">
+  <div class="max-w-[1400px] mx-auto flex items-center justify-between px-6 md:px-10 py-6 transition-all duration-500" id="nav-inner">
+    <a href="#top" class="font-display text-xl md:text-2xl tracking-tight" id="nav-logo">Ember &amp; Oak</a>
+
+    <nav class="hidden md:flex items-center gap-9 text-sm" id="nav-links">
+      <a href="#menu" class="nav-link">Menu</a>
+      <a href="#story" class="nav-link">Our Story</a>
+      <a href="#visit" class="nav-link">Visit</a>
+      <a href="#contact" class="nav-link">Contact</a>
+      <a href="#reserve" class="btn-primary !py-3 !px-5 text-xs">Reserve a Table</a>
+    </nav>
+
+    <button id="menu-toggle" class="md:hidden flex flex-col gap-1.5 w-8 z-[60]" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+      <span class="block h-px w-full bg-current transition-transform duration-300" id="bar1"></span>
+      <span class="block h-px w-full bg-current transition-opacity duration-300" id="bar2"></span>
+      <span class="block h-px w-full bg-current transition-transform duration-300" id="bar3"></span>
+    </button>
+  </div>
+</header>
+
+<!-- MOBILE MENU -->
+<div id="mobile-menu" class="fixed inset-0 z-40 bg-espresso text-paper md:hidden">
+  <div class="h-full flex flex-col justify-center px-8 gap-7 font-display text-4xl">
+    <a href="#menu" class="mobile-link">Menu</a>
+    <a href="#story" class="mobile-link">Our Story</a>
+    <a href="#visit" class="mobile-link">Visit</a>
+    <a href="#contact" class="mobile-link">Contact</a>
+    <a href="#reserve" class="mobile-link text-copper">Reserve a Table</a>
+  </div>
+</div>
+
+<main id="main">
+
+  <!-- HERO -->
+  <section id="top" class="relative h-[100svh] min-h-[560px] w-full overflow-hidden photo grain">
+    <div class="absolute inset-0 img-bg hero-bg-anim" style="background-image: url('https://images.unsplash.com/photo-1442512595331-e89e73853f31?q=80&w=2940&auto=format&fit=crop'); background-position: center 45%;"></div>
+    <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.85) 100%);"></div>
+    <div class="photo-label always-label">Espresso bar, early light — Ember &amp; Oak, Pune</div>
+
+    <div class="relative z-10 h-full flex flex-col justify-end px-6 md:px-10 pb-14 md:pb-20 max-w-[1400px] mx-auto text-paper">
+      <p class="text-xs tracking-[0.15em] text-paper/70 mb-5 reveal" data-reveal>Open daily · 8:00 AM — 11:00 PM</p>
+      <h1 class="font-display fs-hero max-w-4xl reveal" data-reveal>Coffee worth<br>slowing down for.</h1>
+      <p class="mt-6 max-w-md text-paper/80 text-base md:text-lg reveal" data-reveal>Specialty coffee, thoughtful plates, and warm spaces made for lingering.</p>
+      <div class="mt-9 flex flex-wrap gap-4 reveal" data-reveal>
+        <a href="#menu" class="btn-primary">Explore the Menu</a>
+        <a href="#visit" class="btn-outline border-paper/70 text-paper hover:!text-espresso">Find Us</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- BRAND INTRO -->
+  <section id="story" class="max-w-[1400px] mx-auto px-6 md:px-10 py-24 md:py-36">
+    <div class="grid md:grid-cols-12 gap-8 md:gap-4">
+      <div class="md:col-span-5 reveal" data-reveal>
+        <h2 class="font-display fs-section title-sweep" data-reveal>Good coffee<br>is only the<br>beginning.</h2>
+      </div>
+      <div class="md:col-span-1"></div>
+      <div class="md:col-span-6 flex items-end reveal" data-reveal>
+        <p class="text-lg md:text-xl leading-relaxed text-bark">
+          Ember &amp; Oak was built around a simple idea: a café should give you a reason to stay. We source single-origin beans in small batches, cook food with the same seriousness we bring to coffee, and design every room to hold a slow morning or a long conversation equally well.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SIGNATURE EXPERIENCE -->
+  <section class="border-t border-espresso/10">
+    <div class="max-w-[1400px] mx-auto px-6 md:px-10 py-6 md:py-10">
+      <p class="text-xs tracking-[0.1em] text-bark/70 reveal" data-reveal>Through the day</p>
+    </div>
+
+    <!-- item 1 -->
+    <div class="grid md:grid-cols-2 items-stretch border-t border-espresso/10">
+      <div class="order-2 md:order-1 flex flex-col justify-center px-6 md:px-16 py-16 md:py-28 reveal" data-reveal>
+        <span class="font-display text-sm text-copper mb-4">01</span>
+        <h3 class="font-display text-3xl md:text-4xl mb-4">Specialty Coffee</h3>
+        <p class="text-bark max-w-sm">Single-origin beans, dialed in daily. Every cup is pulled to a recipe our baristas taste and adjust each morning.</p>
+      </div>
+      <div class="order-1 md:order-2 h-[46vh] md:h-[60vh] photo grain hover-scale" style="background-image: url('https://images.unsplash.com/photo-1541167760496-1628856ab772?q=80&w=2940&auto=format&fit=crop'); background-size: cover; background-position: center;">
+        <div class="scaletarget w-full h-full"></div>
+        <div class="photo-label">Pour-over, single origin</div>
+      </div>
+    </div>
+
+    <!-- item 2 -->
+    <div class="grid md:grid-cols-2 items-stretch border-t border-espresso/10">
+      <div class="h-[46vh] md:h-[60vh] photo grain hover-scale" style="background-image: url('https://images.unsplash.com/photo-1600891964092-4316c288032e?q=80&w=2940&auto=format&fit=crop'); background-size: cover; background-position: center;">
+        <div class="scaletarget w-full h-full"></div>
+        <div class="photo-label">Burrata sourdough, plated</div>
+      </div>
+      <div class="flex flex-col justify-center px-6 md:px-16 py-16 md:py-28 reveal" data-reveal>
+        <span class="font-display text-sm text-copper mb-4">02</span>
+        <h3 class="font-display text-3xl md:text-4xl mb-4">All-Day Plates</h3>
+        <p class="text-bark max-w-sm">Thoughtful comfort food with a modern edge — built for a working lunch or an unhurried dinner.</p>
+      </div>
+    </div>
+
+    <!-- item 3 -->
+    <div class="grid md:grid-cols-2 items-stretch border-t border-espresso/10">
+      <div class="order-2 md:order-1 flex flex-col justify-center px-6 md:px-16 py-16 md:py-28 reveal" data-reveal>
+        <span class="font-display text-sm text-copper mb-4">03</span>
+        <h3 class="font-display text-3xl md:text-4xl mb-4">Slow Mornings</h3>
+        <p class="text-bark max-w-sm">Fresh pastries, warm light, and nowhere else to be. Our corner tables fill up early for a reason.</p>
+      </div>
+      <div class="order-1 md:order-2 h-[46vh] md:h-[60vh] photo grain hover-scale" style="background-image: url('https://images.unsplash.com/photo-1555507036-ab1f4038808a?q=80&w=2940&auto=format&fit=crop'); background-size: cover; background-position: center;">
+        <div class="scaletarget w-full h-full"></div>
+        <div class="photo-label">Window seat, 8:30 AM</div>
+      </div>
+    </div>
+
+    <!-- item 4 -->
+    <div class="grid md:grid-cols-2 items-stretch border-t border-b border-espresso/10">
+      <div class="h-[46vh] md:h-[60vh] photo grain hover-scale" style="background-image: url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=2940&auto=format&fit=crop'); background-size: cover; background-position: center;">
+        <div class="scaletarget w-full h-full"></div>
+        <div class="photo-label">Bar, after dark</div>
+      </div>
+      <div class="flex flex-col justify-center px-6 md:px-16 py-16 md:py-28 reveal" data-reveal>
+        <span class="font-display text-sm text-copper mb-4">04</span>
+        <h3 class="font-display text-3xl md:text-4xl mb-4">Late Evenings</h3>
+        <p class="text-bark max-w-sm">Coffee by day. Conversations by night — the lights come down and the room slows with them.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MENU PREVIEW -->
+  <section id="menu" class="max-w-[1400px] mx-auto px-6 md:px-10 py-24 md:py-36">
+    <div class="grid md:grid-cols-12 gap-8 mb-12 md:mb-16">
+      <div class="md:col-span-7 reveal" data-reveal>
+        <h2 class="font-display fs-section title-sweep" data-reveal>A little something<br>for every kind of craving.</h2>
+      </div>
+      <div class="md:col-span-4 md:col-start-9 flex items-end reveal" data-reveal>
+        <p class="text-bark">A short preview — the full list changes with the season.</p>
+      </div>
+    </div>
+
+    <div class="flex gap-8 border-b border-espresso/10 mb-10 overflow-x-auto text-sm reveal" data-reveal role="tablist">
+      <button class="menu-tab active pb-4" data-tab="coffee" role="tab" aria-selected="true">Coffee</button>
+      <button class="menu-tab pb-4" data-tab="breakfast" role="tab" aria-selected="false">Breakfast</button>
+      <button class="menu-tab pb-4" data-tab="mains" role="tab" aria-selected="false">Mains</button>
+      <button class="menu-tab pb-4" data-tab="desserts" role="tab" aria-selected="false">Desserts</button>
+    </div>
+
+    <div id="menu-panels" class="reveal" data-reveal>
+
+      <!-- COFFEE -->
+      <div class="menu-panel active" data-panel="coffee">
+        <ul class="divide-y divide-espresso/10">
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Ember Flat White<span class="menu-desc">Double shot, silk-textured milk, single-origin Chikmagalur</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹220</span>
+          </li>
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Oak Latte<span class="menu-desc">Slow-steamed milk, house blend, hint of toasted hazelnut</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹240</span>
+          </li>
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Orange Blossom Cold Brew<span class="menu-desc">18-hour steep, citrus zest, poured over clear ice</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹280</span>
+          </li>
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Filter Kaapi, Reimagined<span class="menu-desc">South Indian decoction, chicory, frothed milk in brass dabara</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹180</span>
+          </li>
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Espresso Tonic<span class="menu-desc">Ristretto shot, tonic water, rosemary sprig, orange peel</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹260</span>
+          </li>
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Cortado<span class="menu-desc">Equal parts espresso and warm milk, served in glass</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹200</span>
+          </li>
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Honey Cardamom Cappuccino<span class="menu-desc">Wild honey, green cardamom, cocoa dust finish</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹250</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- BREAKFAST -->
+      <div class="menu-panel" data-panel="breakfast">
+        <ul class="divide-y divide-espresso/10">
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Truffle Mushroom Toast<span class="menu-desc">Sourdough, wild mushrooms, black truffle oil, parmesan</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹320</span>
+          </li>
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Chili Scrambled Eggs<span class="menu-desc">Farm eggs, green chili, coriander, buttered brioche</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹260</span>
+          </li>
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">The Ember Breakfast<span class="menu-desc">Smoked butter eggs, charred sourdough, whipped ricotta, chili honey</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹420</span>
+          </li>
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Buttermilk Pancake Stack<span class="menu-desc">Three pancakes, maple butter, seasonal berry compote</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹340</span>
+          </li>
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Avocado &amp; Poached Egg<span class="menu-desc">Multigrain toast, smashed avocado, dukkah, poached egg</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹360</span>
+          </li>
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Almond Croissant<span class="menu-desc">Baked fresh daily, frangipane filling, toasted flakes</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹220</span>
+          </li>
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Greek Yogurt Bowl<span class="menu-desc">House granola, honey, toasted seeds, seasonal fruit</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹280</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- MAINS -->
+      <div class="menu-panel" data-panel="mains">
+        <ul class="divide-y divide-espresso/10">
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Burrata Sourdough<span class="menu-desc">Creamy burrata, heirloom tomato, basil oil, aged balsamic</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹380</span>
+          </li>
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Truffle Rigatoni<span class="menu-desc">Hand-rolled pasta, black truffle cream, parmesan crisp</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹460</span>
+          </li>
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Grilled Chicken Caesar<span class="menu-desc">Herb-marinated chicken, romaine, sourdough croutons, anchovy dressing</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹420</span>
+          </li>
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Smoked Paneer Steak<span class="menu-desc">Charred paneer, red pepper romesco, quinoa tabbouleh</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹440</span>
+          </li>
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Wild Mushroom Risotto<span class="menu-desc">Arborio rice, porcini broth, mascarpone, thyme</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹480</span>
+          </li>
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Ember Smash Burger<span class="menu-desc">Double patty, aged cheddar, house pickles, brioche bun</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹420</span>
+          </li>
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Herb Roast Chicken<span class="menu-desc">Half chicken, lemon-thyme jus, crushed potatoes</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹560</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- DESSERTS -->
+      <div class="menu-panel" data-panel="desserts">
+        <ul class="divide-y divide-espresso/10">
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Basque Cheesecake<span class="menu-desc">Burnt top, molten centre, vanilla bean</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹280</span>
+          </li>
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Dark Chocolate Tart<span class="menu-desc">70% single-origin chocolate, sea salt, cocoa crust</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹300</span>
+          </li>
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Tiramisu, Ember Style<span class="menu-desc">Espresso-soaked savoiardi, mascarpone, cocoa dust</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹320</span>
+          </li>
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Warm Brownie &amp; Ice Cream<span class="menu-desc">Fudge brownie, vanilla bean scoop, salted caramel</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹340</span>
+          </li>
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Lemon Olive Oil Cake<span class="menu-desc">Citrus glaze, rosemary, whipped crème fraîche</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹260</span>
+          </li>
+          <li class="flex justify-between items-baseline py-5">
+            <span class="font-display text-lg">Affogato<span class="menu-desc">Vanilla gelato, double espresso, amaretti crumble</span></span>
+            <span class="text-bark text-sm whitespace-nowrap ml-6">₹220</span>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <button type="button" id="open-full-menu" class="btn-outline border-espresso mt-12 reveal" data-reveal>View Full Menu</button>
+  </section>
+
+  <!-- FEATURED ITEM -->
+  <section class="grid md:grid-cols-2 items-stretch bg-espresso text-paper">
+    <div class="h-[50vh] md:h-auto photo grain hover-scale" style="background-image: url('https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?q=80&w=2940&auto=format&fit=crop'); background-size: cover; background-position: center;">
+      <div class="scaletarget w-full h-full"></div>
+      <div class="photo-label">The Ember Breakfast</div>
+    </div>
+    <div class="flex flex-col justify-center px-6 md:px-16 py-20 md:py-0 reveal" data-reveal>
+      <p class="text-xs tracking-[0.1em] text-paper/60 mb-4">Signature</p>
+      <h3 class="font-display text-4xl md:text-5xl mb-6">The Ember Breakfast</h3>
+      <p class="text-paper/75 max-w-sm mb-8">Smoked butter eggs, charred sourdough, whipped ricotta and a drizzle of chili honey. The plate most people order twice in one visit.</p>
+      <button type="button" id="open-full-menu-2" class="btn-outline border-paper/60 text-paper hover:!text-espresso w-fit">View Full Menu</button>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section class="max-w-[1400px] mx-auto px-6 md:px-10 py-24 md:py-36">
+    <h2 class="font-display fs-section mb-12 md:mb-16 reveal title-sweep" data-reveal>Inside Ember &amp; Oak.</h2>
+
+    <div class="grid grid-cols-6 gap-3 md:gap-4 reveal-stagger" data-reveal>
+      <div class="col-span-6 md:col-span-4 h-[46vh] photo grain hover-scale" style="background-image: url('https://images.unsplash.com/photo-1559925393-8be0ec4767c8?q=80&w=2940&auto=format&fit=crop'); background-size: cover; background-position: center;">
+        <div class="scaletarget w-full h-full"></div><div class="photo-label">Exterior, corner entrance</div>
+      </div>
+      <div class="col-span-3 md:col-span-2 h-[46vh] photo grain hover-scale" style="background-image: url('https://images.unsplash.com/photo-1561043433-aaf687c4cf04?q=80&w=2940&auto=format&fit=crop'); background-size: cover; background-position: center;">
+        <div class="scaletarget w-full h-full"></div><div class="photo-label">Steamed milk, close-up</div>
+      </div>
+      <div class="col-span-3 md:col-span-2 h-[34vh] photo grain hover-scale" style="background-image: url('https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=2940&auto=format&fit=crop'); background-size: cover; background-position: center;">
+        <div class="scaletarget w-full h-full"></div><div class="photo-label">Reading corner</div>
+      </div>
+      <div class="col-span-6 md:col-span-2 h-[34vh] photo grain hover-scale" style="background-image: url('https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?q=80&w=2940&auto=format&fit=crop'); background-size: cover; background-position: center;">
+        <div class="scaletarget w-full h-full"></div><div class="photo-label">Communal table, midday</div>
+      </div>
+      <div class="col-span-3 md:col-span-2 h-[40vh] photo grain hover-scale" style="background-image: url('https://images.unsplash.com/photo-1447933601403-0c6688de566e?q=80&w=2940&auto=format&fit=crop'); background-size: cover; background-position: center;">
+        <div class="scaletarget w-full h-full"></div><div class="photo-label">Roastery wall detail</div>
+      </div>
+      <div class="col-span-3 md:col-span-2 h-[40vh] photo grain hover-scale" style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=2940&auto=format&fit=crop'); background-size: cover; background-position: center;">
+        <div class="scaletarget w-full h-full"></div><div class="photo-label">Evening, low light</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE SPACE -->
+  <section class="relative min-h-[80vh] photo grain flex items-end always-label" style="background-image: url('https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=2940&auto=format&fit=crop'); background-size: cover; background-position: center 55%;">
+    <div class="absolute inset-0" style="background: linear-gradient(0deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.15) 55%);"></div>
+    <div class="photo-label">Main room, natural materials</div>
+    <div class="relative z-10 max-w-[1400px] mx-auto px-6 md:px-10 pb-16 md:pb-24 w-full text-paper">
+      <div class="grid md:grid-cols-12 gap-8">
+        <div class="md:col-span-7 reveal" data-reveal>
+          <h2 class="font-display fs-section title-sweep" data-reveal>Come for the coffee.<br>Stay for the space.</h2>
+        </div>
+        <div class="md:col-span-4 md:col-start-9 flex items-end reveal" data-reveal>
+          <p class="text-paper/80">Natural oak, warm brass light, and corners built for both a laptop and a long lunch. Music stays low enough to talk over.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="max-w-[1400px] mx-auto px-6 md:px-10 py-24 md:py-36">
+    <div class="grid md:grid-cols-3 gap-12 md:gap-8 reveal-stagger" data-reveal>
+      <blockquote>
+        <p class="font-display text-2xl leading-snug mb-6">"One of those places where you accidentally spend three hours."</p>
+        <cite class="not-italic text-sm text-bark">— Aditi M.</cite>
+      </blockquote>
+      <blockquote>
+        <p class="font-display text-2xl leading-snug mb-6">"Probably the best coffee break we've had all month."</p>
+        <cite class="not-italic text-sm text-bark">— Rohan K.</cite>
+      </blockquote>
+      <blockquote>
+        <p class="font-display text-2xl leading-snug mb-6">"The kind of café you want to keep to yourself."</p>
+        <cite class="not-italic text-sm text-bark">— Meera S.</cite>
+      </blockquote>
+    </div>
+  </section>
+
+  <!-- INSTAGRAM -->
+  <section class="border-t border-espresso/10">
+    <div class="max-w-[1400px] mx-auto px-6 md:px-10 pt-20 md:pt-28 pb-10 flex flex-wrap items-end justify-between gap-6">
+      <h2 class="font-display fs-section reveal title-sweep" data-reveal>See what's brewing.</h2>
+      <div class="reveal" data-reveal>
+        <p class="text-bark mb-2">@emberandoak</p>
+        <a href="https://instagram.com/emberandoak" target="_blank" rel="noopener" class="btn-outline border-espresso">Follow Along</a>
+      </div>
+    </div>
+    <div class="grid grid-cols-3 md:grid-cols-6 gap-1 md:gap-2 px-1 md:px-2 pb-20 md:pb-28">
+      <div class="aspect-square photo hover-scale reveal img-bg" data-reveal style="background-image: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1200&auto=format&fit=crop'); background-position: center;"><div class="scaletarget w-full h-full"></div></div>
+      <div class="aspect-square photo hover-scale reveal img-bg" data-reveal style="background-image: url('https://images.unsplash.com/photo-1447933601403-0c6688de566e?q=80&w=1200&auto=format&fit=crop'); background-position: center;"><div class="scaletarget w-full h-full"></div></div>
+      <div class="aspect-square photo hover-scale reveal img-bg" data-reveal style="background-image: url('https://images.unsplash.com/photo-1504630083234-14187a9df0f5?q=80&w=1200&auto=format&fit=crop'); background-position: center;"><div class="scaletarget w-full h-full"></div></div>
+      <div class="aspect-square photo hover-scale reveal img-bg" data-reveal style="background-image: url('https://images.unsplash.com/photo-1521017432531-fbd92d768814?q=80&w=1200&auto=format&fit=crop'); background-position: center;"><div class="scaletarget w-full h-full"></div></div>
+      <div class="aspect-square photo hover-scale reveal img-bg" data-reveal style="background-image: url('https://images.unsplash.com/photo-1507133750040-4a8f57021571?q=80&w=1200&auto=format&fit=crop'); background-position: center;"><div class="scaletarget w-full h-full"></div></div>
+      <div class="aspect-square photo hover-scale reveal img-bg" data-reveal style="background-image: url('https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=1200&auto=format&fit=crop'); background-position: center;"><div class="scaletarget w-full h-full"></div></div>
+    </div>
+  </section>
+
+  <!-- LOCATION -->
+  <section id="visit" class="max-w-[1400px] mx-auto px-6 md:px-10 py-24 md:py-36">
+    <div class="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
+      <div id="contact" class="reveal" data-reveal>
+        <p class="text-xs tracking-[0.1em] text-bark/70 mb-6">Visit</p>
+        <h2 class="font-display text-4xl md:text-5xl mb-8">Ember &amp; Oak</h2>
+        <p class="text-lg mb-1">21 Riverside Avenue</p>
+        <p class="text-lg mb-6">Pune, Maharashtra</p>
+        <p class="text-bark mb-1">Open Daily</p>
+        <p class="text-bark mb-8">8:00 AM — 11:00 PM</p>
+        <div class="flex flex-wrap gap-4">
+          <a href="https://maps.google.com/?q=21+Riverside+Avenue+Pune" target="_blank" rel="noopener" class="btn-primary">Get Directions</a>
+          <a href="tel:+912000000000" class="btn-outline border-espresso">Call the Café</a>
+        </div>
+      </div>
+      <div class="h-[40vh] md:h-[52vh] photo grain reveal" data-reveal style="background:
+          repeating-linear-gradient(0deg, rgba(26,19,16,0.06) 0px, rgba(26,19,16,0.06) 1px, transparent 1px, transparent 42px),
+          repeating-linear-gradient(90deg, rgba(26,19,16,0.06) 0px, rgba(26,19,16,0.06) 1px, transparent 1px, transparent 42px),
+          #EFE6D4;">
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="w-3.5 h-3.5 rounded-full bg-copper ring-8 ring-copper/20"></div>
+        </div>
+        <div class="photo-label" style="color: rgba(26,19,16,0.55);">Map — Riverside Avenue</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section id="reserve" class="relative min-h-[70vh] photo grain flex items-center always-label" style="background-image: url('https://images.unsplash.com/photo-1521017432531-fbd92d768814?q=80&w=2940&auto=format&fit=crop'); background-size: cover; background-position: center 40%;">
+    <div class="absolute inset-0" style="background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.25) 60%);"></div>
+    <div class="photo-label">Evening, front window</div>
+    <div class="relative z-10 max-w-[1400px] mx-auto px-6 md:px-10 py-24 text-paper text-center w-full">
+      <h2 class="font-display fs-section mb-6 reveal" data-reveal>Your table is waiting.</h2>
+      <p class="text-paper/75 text-lg mb-10 reveal" data-reveal>Come for the coffee. Stay for everything else.</p>
+      <div class="flex flex-wrap gap-4 justify-center reveal" data-reveal>
+        <a href="tel:+912000000000" class="btn-primary !bg-copper hover:!bg-paper hover:!text-espresso">Reserve a Table</a>
+        <a href="https://maps.google.com/?q=21+Riverside+Avenue+Pune" target="_blank" rel="noopener" class="btn-outline border-paper/60 text-paper hover:!text-espresso">Get Directions</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-espresso text-paper/80">
+    <div class="max-w-[1400px] mx-auto px-6 md:px-10 py-16 grid md:grid-cols-4 gap-10">
+      <div>
+        <p class="font-display text-2xl text-paper mb-3">Ember &amp; Oak</p>
+        <p class="text-sm">Specialty coffee · Thoughtful food · Good company</p>
+      </div>
+      <div class="text-sm">
+        <p class="text-paper mb-3">Navigate</p>
+        <ul class="space-y-2">
+          <li><a href="#menu" class="hover:text-paper">Menu</a></li>
+          <li><a href="#story" class="hover:text-paper">Our Story</a></li>
+          <li><a href="#visit" class="hover:text-paper">Visit</a></li>
+          <li><a href="#contact" class="hover:text-paper">Contact</a></li>
+        </ul>
+      </div>
+      <div class="text-sm">
+        <p class="text-paper mb-3">Connect</p>
+        <ul class="space-y-2">
+          <li><a href="https://instagram.com/emberandoak" target="_blank" rel="noopener" class="hover:text-paper">Instagram</a></li>
+          <li><a href="mailto:hello@emberandoak.com" class="hover:text-paper">hello@emberandoak.com</a></li>
+        </ul>
+      </div>
+      <div class="text-sm">
+        <p class="text-paper mb-3">Location</p>
+        <p>21 Riverside Avenue<br>Pune, Maharashtra</p>
+      </div>
+    </div>
+    <div class="border-t border-paper/10 px-6 md:px-10 py-6 text-xs text-paper/50">
+      © <span id="year"></span> Ember &amp; Oak. All rights reserved.
+    </div>
+  </footer>
+
+</main>
+
+<!-- STICKY MOBILE CTA -->
+<div class="md:hidden fixed bottom-0 inset-x-0 z-50 bg-espresso text-paper grid grid-cols-3 text-center text-xs tracking-wide">
+  <a href="#reserve" class="py-4 border-r border-paper/10">Reserve</a>
+  <a href="#menu" class="py-4 border-r border-paper/10">Menu</a>
+  <a href="https://maps.google.com/?q=21+Riverside+Avenue+Pune" target="_blank" rel="noopener" class="py-4">Directions</a>
+</div>
+
+<!-- FULL MENU MODAL -->
+<div id="full-menu-modal" class="menu-modal" role="dialog" aria-modal="true" aria-labelledby="full-menu-title">
+  <div class="menu-modal-card">
+    <button type="button" class="menu-modal-close" id="close-full-menu" aria-label="Close full menu">✕</button>
+    <p class="text-xs tracking-[0.15em] text-bark/70 mb-2">Ember &amp; Oak · Pune</p>
+    <h2 id="full-menu-title" class="font-display text-3xl md:text-4xl mb-2">The Full Menu</h2>
+    <p class="text-bark text-sm mb-6">Seasonal, sourced daily. Prices in INR, inclusive of taxes.</p>
+
+    <h3 class="menu-modal-section-title">Coffee</h3>
+    <ul>
+      <li><span class="font-display">Ember Flat White<span class="menu-desc">Double shot, silk-textured milk, single-origin Chikmagalur</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹220</span></li>
+      <li><span class="font-display">Oak Latte<span class="menu-desc">Slow-steamed milk, house blend, hint of toasted hazelnut</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹240</span></li>
+      <li><span class="font-display">Orange Blossom Cold Brew<span class="menu-desc">18-hour steep, citrus zest, poured over clear ice</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹280</span></li>
+      <li><span class="font-display">Filter Kaapi, Reimagined<span class="menu-desc">South Indian decoction, chicory, frothed milk in brass dabara</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹180</span></li>
+      <li><span class="font-display">Espresso Tonic<span class="menu-desc">Ristretto shot, tonic water, rosemary sprig, orange peel</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹260</span></li>
+      <li><span class="font-display">Cortado<span class="menu-desc">Equal parts espresso and warm milk, served in glass</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹200</span></li>
+      <li><span class="font-display">Honey Cardamom Cappuccino<span class="menu-desc">Wild honey, green cardamom, cocoa dust finish</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹250</span></li>
+    </ul>
+
+    <h3 class="menu-modal-section-title">Breakfast</h3>
+    <ul>
+      <li><span class="font-display">Truffle Mushroom Toast<span class="menu-desc">Sourdough, wild mushrooms, black truffle oil, parmesan</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹320</span></li>
+      <li><span class="font-display">Chili Scrambled Eggs<span class="menu-desc">Farm eggs, green chili, coriander, buttered brioche</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹260</span></li>
+      <li><span class="font-display">The Ember Breakfast<span class="menu-desc">Smoked butter eggs, charred sourdough, whipped ricotta, chili honey</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹420</span></li>
+      <li><span class="font-display">Buttermilk Pancake Stack<span class="menu-desc">Three pancakes, maple butter, seasonal berry compote</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹340</span></li>
+      <li><span class="font-display">Avocado &amp; Poached Egg<span class="menu-desc">Multigrain toast, smashed avocado, dukkah, poached egg</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹360</span></li>
+      <li><span class="font-display">Almond Croissant<span class="menu-desc">Baked fresh daily, frangipane filling, toasted flakes</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹220</span></li>
+      <li><span class="font-display">Greek Yogurt Bowl<span class="menu-desc">House granola, honey, toasted seeds, seasonal fruit</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹280</span></li>
+    </ul>
+
+    <h3 class="menu-modal-section-title">Mains</h3>
+    <ul>
+      <li><span class="font-display">Burrata Sourdough<span class="menu-desc">Creamy burrata, heirloom tomato, basil oil, aged balsamic</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹380</span></li>
+      <li><span class="font-display">Truffle Rigatoni<span class="menu-desc">Hand-rolled pasta, black truffle cream, parmesan crisp</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹460</span></li>
+      <li><span class="font-display">Grilled Chicken Caesar<span class="menu-desc">Herb-marinated chicken, romaine, sourdough croutons, anchovy dressing</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹420</span></li>
+      <li><span class="font-display">Smoked Paneer Steak<span class="menu-desc">Charred paneer, red pepper romesco, quinoa tabbouleh</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹440</span></li>
+      <li><span class="font-display">Wild Mushroom Risotto<span class="menu-desc">Arborio rice, porcini broth, mascarpone, thyme</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹480</span></li>
+      <li><span class="font-display">Ember Smash Burger<span class="menu-desc">Double patty, aged cheddar, house pickles, brioche bun</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹420</span></li>
+      <li><span class="font-display">Herb Roast Chicken<span class="menu-desc">Half chicken, lemon-thyme jus, crushed potatoes</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹560</span></li>
+    </ul>
+
+    <h3 class="menu-modal-section-title">Desserts</h3>
+    <ul>
+      <li><span class="font-display">Basque Cheesecake<span class="menu-desc">Burnt top, molten centre, vanilla bean</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹280</span></li>
+      <li><span class="font-display">Dark Chocolate Tart<span class="menu-desc">70% single-origin chocolate, sea salt, cocoa crust</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹300</span></li>
+      <li><span class="font-display">Tiramisu, Ember Style<span class="menu-desc">Espresso-soaked savoiardi, mascarpone, cocoa dust</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹320</span></li>
+      <li><span class="font-display">Warm Brownie &amp; Ice Cream<span class="menu-desc">Fudge brownie, vanilla bean scoop, salted caramel</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹340</span></li>
+      <li><span class="font-display">Lemon Olive Oil Cake<span class="menu-desc">Citrus glaze, rosemary, whipped crème fraîche</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹260</span></li>
+      <li><span class="font-display">Affogato<span class="menu-desc">Vanilla gelato, double espresso, amaretti crumble</span></span><span class="text-bark text-sm whitespace-nowrap ml-6">₹220</span></li>
+    </ul>
+
+    <p class="text-xs text-bark/60 mt-8 text-center">Menu rotates with the season · Ask your server for today's specials</p>
+  </div>
+</div>
+
+<!-- BACK TO TOP -->
+<button id="back-to-top" aria-label="Back to top">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  const nav = document.getElementById('site-nav');
+  const navInner = document.getElementById('nav-inner');
+  const navLogo = document.getElementById('nav-logo');
+  const navLinks = document.getElementById('nav-links');
+
+  function updateNav() {
+    if (window.scrollY > 40) {
+      nav.style.background = 'rgba(250,246,238,0.92)';
+      nav.style.backdropFilter = 'blur(10px)';
+      navInner.style.paddingTop = '0.9rem';
+      navInner.style.paddingBottom = '0.9rem';
+      navLogo.style.color = '#1A1310';
+      navLinks.style.color = '#1A1310';
+      navLinks.querySelector('.btn-primary').style.color = '#F2EBDD';
+      nav.style.boxShadow = '0 1px 0 rgba(26,19,16,0.08)';
+    } else {
+      nav.style.background = 'transparent';
+      nav.style.backdropFilter = 'none';
+      navInner.style.paddingTop = '1.5rem';
+      navInner.style.paddingBottom = '1.5rem';
+      navLogo.style.color = '#FAF6EE';
+      navLinks.style.color = '#FAF6EE';
+      nav.style.boxShadow = 'none';
+    }
+  }
+  updateNav();
+  window.addEventListener('scroll', updateNav, { passive: true });
+
+  const menuToggle = document.getElementById('menu-toggle');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const bar1 = document.getElementById('bar1'), bar2 = document.getElementById('bar2'), bar3 = document.getElementById('bar3');
+  let menuOpen = false;
+  menuToggle.addEventListener('click', () => {
+    menuOpen = !menuOpen;
+    mobileMenu.classList.toggle('open', menuOpen);
+    menuToggle.setAttribute('aria-expanded', String(menuOpen));
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    bar1.style.transform = menuOpen ? 'translateY(6px) rotate(45deg)' : '';
+    bar3.style.transform = menuOpen ? 'translateY(-6px) rotate(-45deg)' : '';
+    bar2.style.opacity = menuOpen ? '0' : '1';
+  });
+  document.querySelectorAll('.mobile-link').forEach(a => a.addEventListener('click', () => menuToggle.click()));
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+  document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
+
+  document.querySelectorAll('.menu-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.menu-tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); });
+      document.querySelectorAll('.menu-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+      document.querySelector('.menu-panel[data-panel="' + tab.dataset.tab + '"]').classList.add('active');
+    });
+  });
+
+  const fullMenuModal = document.getElementById('full-menu-modal');
+  const openFullMenu = document.getElementById('open-full-menu');
+  const openFullMenu2 = document.getElementById('open-full-menu-2');
+  const closeFullMenu = document.getElementById('close-full-menu');
+
+  function showFullMenu() {
+    fullMenuModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function hideFullMenu() {
+    fullMenuModal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  openFullMenu && openFullMenu.addEventListener('click', showFullMenu);
+  openFullMenu2 && openFullMenu2.addEventListener('click', showFullMenu);
+  closeFullMenu && closeFullMenu.addEventListener('click', hideFullMenu);
+  fullMenuModal && fullMenuModal.addEventListener('click', (e) => {
+    if (e.target === fullMenuModal) hideFullMenu();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && fullMenuModal.classList.contains('open')) hideFullMenu();
+  });
+
+  const backToTop = document.getElementById('back-to-top');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 600) backToTop.classList.add('show');
+    else backToTop.classList.remove('show');
+  }, { passive: true });
+  backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+</script>
+
+</body>
+</html>

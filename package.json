@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i ./input.css -o ./styles.css --minify"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.19"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "framer-motion": "^13.4.0"
+  }
+}
